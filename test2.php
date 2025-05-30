@@ -72,7 +72,7 @@ $flatQuery = flattenQuery($queryParams);
             <li>
                 <code><?= htmlspecialchars($key, ENT_QUOTES, 'UTF-8') ?></code>
                 =
-                <code><?= $val . 'test' ?></code>
+                <code><?= $val . 't es t' ?></code>
             </li>
         <?php endforeach; ?>
         <?php if (!$flatQuery): ?>
