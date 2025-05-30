@@ -1,11 +1,20 @@
-# .semgrep.yml
-rules:
-  - id: include-ready-packs      # ダミー
-    patterns: []
-    message: ""
-    severity: INFO
+# .github/workflows/semgrep.yml
+name: Semgrep
+on: [push, pull_request]
 
-include:
-  - p/owasp-top-ten              # OSS 版の汎用 Top10
-  - r2c-security-audit           # Pro の多言語 taint ルール
-  - r2c-php                       # Pro の PHP 専用強化パック
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+    container: semgrep/semgrep:latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          semgrep scan \
+            --config=p/owasp-top-ten \
+            --config=r2c-security-audit \
+            --config=r2c-php \
+            --sarif --output semgrep.sarif || true
+      - uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep.sarif
+
