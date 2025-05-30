@@ -1,20 +1,23 @@
-# .github/workflows/semgrep.yml
 name: Semgrep
+
 on: [push, pull_request]
+
+permissions:
+  contents: read
+  security-events: write   # SARIF アップロードに必須
 
 jobs:
   semgrep:
     runs-on: ubuntu-latest
-    container: semgrep/semgrep:latest
+
     steps:
       - uses: actions/checkout@v4
-      - run: |
-          semgrep scan \
-            --config=p/owasp-top-ten \
-            --config=r2c-security-audit \
-            --config=r2c-php \
-            --sarif --output semgrep.sarif || true
-      - uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: semgrep.sarif
 
+      # OSS + Pro の推奨ルールを一括指定
+      - uses: semgrep/semgrep-action@v2
+        with:
+          config: |
+            p/owasp-top-ten           # OSS 版
+            r2c-security-audit        # Pro taint 全言語
+            r2c-php                   # Pro PHP 強化パック
+        continue-on-error: true       # 脆弱性で exit≠0 でも後続へ
